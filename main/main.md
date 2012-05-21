@@ -134,6 +134,7 @@ Person("yuvi", 19104) === Person("colleen", 12345)
 - ... you want more than one equality notion?
 - ... you want your domain objects "light" and free of behavior?
 - ... you want method implementations to be fully known at compile time?
+- ... you want to leave the interface "open" so you can add new implementations later without re-jiggering a type hierarchy
 
 !SLIDE
 # Ad-hoc polymorphism using typeclasses
@@ -151,35 +152,73 @@ PersonEqual equals (Person("yuvi", 19104), Person("colleen", 12345))
 # Now with some sugar
 ```
 trait Equal[A] {
-  def(a1: Equal, a2: Equal): Boolean
+  def(lhs: A, rhs: A): Boolean
+}
+object Equal {
+  implicit def addEqualOps[A:Equal](lhs: A) = new EqualOps(lhs)
+}
+class EqualOps[A](lhs: A)(implicit ev: Eq[A]) {
+  def ===(rhs: A) ev.eq(lhs, rhs)
 }
 implicit object PersonEqual extends Equal[Person] {
   def equals(p1: Person, p2: Person): Boolean = //...
 }
-class EqualOps(a: Any) {
-  def ===(that: a)
-}
-implicit def addEqual(a: Any) = 
-PersonEqual equals (Person("yuvi", 19104), Person("colleen", 12345))
+
+import Equal._
+p1 === p2
 ```
 
+!SLIDE
+# Note this is a brand new type relationship
+```
+//"is-a"
+def mycompare[A <: Comparable](lhs: A, rhs: A) = lhs compare rhs
+
+//"has-a"
+def myequal[A:Equal](lhs: A, rhs: A) = lhs equals rhs
+
+//"has-a", de-sugared, note "ev" is never used
+def myequal[A](lhs: A, rhs: A)(ev: Equal[A]) = lhs equals rhs
+```
 
 !SLIDE
-- No dynamic dispatch, methods known by compiler.
+# Advantages of typeclasses
+- No dynamic dispatch, implementations known to compiler.
 - Behavior is de-coupled from domain object, AND
-- Behavior is de-coupled from trait
-- Multiple equality notions can exist side-by-side
+- Behavior is de-coupled from inheritance, leaving the trait "open"
+- Multiple typeclass instances can exist side-by-side
+
+# Disadvantages of typeclasses
+- Boilerplate (for now)
+- Run-time overhead of wrapper object creation (for now)
+
+!SLIDE
+# More on typeclasses
+- Seth Tisue's NE Scala Talk (video): http://bit.ly/He7rgq
+- Erik Osheim's PHASE talk (slides): http://bit.ly/pbsukl
 
 !SLIDE
 # III. Let's get to some real functional programming ...
 ![pic](main/dontpanic.jpg "don't panic")
+
+# You already do all these things ...
 
 !SLIDE
 # Functors
 
 !SLIDE
 # Applicatives
-No time for this ...
+No time for this ... and not so natural in Scala since functions are not curried by default.
+
+```
+for {
+  url   <- urlOpt
+  pw    <- passwordOpt
+  uname <- usernameOpt
+} yield DriverManager getConnection (url, pw, uname)
+
+(url |@| pw |@| uname) { Driver.getConnection }
+```
 
 !SLIDE
 # Monads
