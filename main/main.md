@@ -17,6 +17,16 @@
 # You don't need to use functional programming to benefit from Scalaz!
 
 !SLIDE
+# Random utilities
+```
+"1".toInt
+"foo".toInt //uh-oh
+
+val iOpt: Option[Int] = "foo".parseInt
+println(iOpt.isDefined ? "parsed" | "unparseable")
+```
+
+!SLIDE
 # `==` Considered Harmful
 
 ```
@@ -96,6 +106,10 @@ Polymorphic functions may do something different depending on its input type.
 
 !SLIDE
 # Ad-hoc polymorphism using inheritance & subtyping
+
+!SLIDE
+# Let's get to some real functional programming ...
+![pic](main/dontpanic.jpg "don't panic")
 
 !SLIDE
 # Functors
