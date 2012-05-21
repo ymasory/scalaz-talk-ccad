@@ -261,6 +261,7 @@ List(1, 2) map { _ + 10 }
 !SLIDE
 # Monads
 `Functors` that can `flatMap`
+
 ![pic](main/monads.jpg "monads")
 
 !SLIDE
@@ -290,16 +291,39 @@ trait Monad[M[_]] extends Applicative[M] {
 - `Option`
 - `Function1`
 
+!SLIDE
+# Aside: This is what Scala already does, although oddly without types or a representation of `Monad`
+
+```
+for {
+  a <- aOpt
+  b <- bOpt
+  c <- cOpt
+} yield a + b + c
+
+aOpt.flatMap { a =>
+  bOpt.flatMap { b =>
+    cOpt.flatMap { c =>
+      a + b + c
+    }
+  }
+}
+```
+
 
 !SLIDE
 # Monoids
 Things you can add.
 
+!SLIDE
 # Technically, Monoids
 - A monoid is a semigroup with a zero element ...
 - A semigroup is a set of elements with the binary operation "plus"
 - Zero is the left and right additive identity ...
 - The set is closed over plus.
+
+!SLIDE
+# What have we gained through a formal representation of functors, monads, and monoids? After all these are ideas already present in Scala and almost every programming language.
 
 !SLIDE
 # Thank you ... questions?
