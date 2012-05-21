@@ -205,9 +205,38 @@ def myequal[A](lhs: A, rhs: A)(ev: Equal[A]) = lhs equals rhs
 
 !SLIDE
 # Functors
+Let's keep it simple: if you can map over it, it's a functor.
+
+```
+trait Functor[F[_]] {
+  def map[A, B](r: F[A], f: A => B): F[B]
+}
+```
 
 !SLIDE
-# Applicatives
+# `Option` is a `Functor`
+```
+object OptionIsFunctor: Functor[Option] = new Functor[Option] {
+  def map[A, B](r: Option[A], f: A => B) = r match {
+    case None => None
+    case Some(a) => Some(f(a))
+  }
+}
+```
+
+!SLIDE
+# `List` is a `Functor`
+```
+object ListIsFunctor: Functor[List] = new Functor[List] {
+  def map[A, B](as: List[A], f: A => B) = as match {
+    case Nil => Nil
+    case h :: t => f(h) :: map(t, f)
+  }
+}
+```
+
+!SLIDE
+# Applicatives (really, Applicative Functors)
 No time for this ... and not so natural in Scala since functions are not curried by default.
 
 ```
@@ -221,11 +250,56 @@ for {
 ```
 
 !SLIDE
+# Aside: This is what Scala already does, although oddly without types or a representation of `Functor`
+
+```
+for (el <- List(1, 2)) yield el + 10
+
+List(1, 2) map { _ + 10 }
+```
+
+!SLIDE
 # Monads
+`Functors` that can `flatMap`
 ![pic](main/monads.jpg "monads")
 
 !SLIDE
+# If we didn't have monads
+```
+def perfectRoot(i: Int): Option[Int] = //...
+val opt = perfectRoot(10000)
+opt map { perfectRoot(_) }
+//Some(Some(10))
+
+opt flatMap { perfectRoot(_) }
+//Some(10)
+```
+
+!SLIDE
+# Monad
+```
+trait Monad[M[_]] extends Applicative[M] {
+  def pure[A](a: => A): M[A]
+  def flatMap[A, B](a: M[A], f: A => M[B]): M[B]
+}
+```
+
+!SLIDE
+# Monads you know
+- `List`
+- `Option`
+- `Function1`
+
+
+!SLIDE
 # Monoids
+Things you can add.
+
+# Technically, Monoids
+- A monoid is a semigroup with a zero element ...
+- A semigroup is a set of elements with the binary operation "plus"
+- Zero is the left and right additive identity ...
+- The set is closed over plus.
 
 !SLIDE
 # Thank you ... questions?
